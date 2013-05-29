@@ -41,9 +41,12 @@ class Factorization
       if i > 0 then d.inc f, i
     return new Factorization d
 
+# note from the above this doesn't work for arbitrary numbers,
+# since we only have so many prime factors :)
 n = Factorization.factorize Math.pow(14,8)
+console.log "n=14^8"
 for i in  [0...25]
-  console.log "#{i} -> #{n.toString()}"
+  console.log "phi_#{i} -> #{n.toString()}"
   n = n.phi()
 
 
