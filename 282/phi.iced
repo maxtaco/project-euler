@@ -40,14 +40,37 @@ class Factorization
         tmp = tmp / f
       if i > 0 then d.inc f, i
     return new Factorization d
+  value : () ->
+    ret = 1
+    for k,v of @factors.dict()
+      for i in [0...v]
+        ret *= k
+    ret
 
 # note from the above this doesn't work for arbitrary numbers,
 # since we only have so many prime factors :)
-n = Factorization.factorize Math.pow(14,8)
-console.log "n=14^8"
-for i in  [0...25]
-  console.log "phi_#{i} -> #{n.toString()}"
-  n = n.phi()
 
+mod_exp = (b,x,m) ->
+  return 0 if m <= 1
+  a = 1
+  for i in [0...x]
+    a = (a*b)%m
+  a
+
+n = Factorization.factorize Math.pow(14,8)
+f = (a,n) ->
+  if n is 1 then return 0
+  if a is 0 then return 1
+  if a is 1 
+    console.log "last phi is #{n}"
+    return 2
+  x = f(a-1, n.phi())
+  ret = mod_exp 2, x, n.value()
+  return ret
+
+console.log "n is #{n.value()}"
+for i in [20...28]
+  v = f i, n
+  console.log "#{i} -> #{v}"
 
 
