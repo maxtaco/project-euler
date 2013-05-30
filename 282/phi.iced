@@ -52,10 +52,12 @@ class Factorization
 
 mod_exp = (b,x,m) ->
   return 0 if m <= 1
-  a = 1
-  for i in [0...x]
-    a = (a*b)%m
-  a
+  ret = 1
+  while x > 0
+    if (x & 0x1) then ret = (b*ret) % m
+    b = (b*b) % m
+    x = Math.floor(x/2)
+  ret
 
 n = Factorization.factorize Math.pow(14,8)
 f = (a,n) ->
@@ -67,7 +69,7 @@ f = (a,n) ->
   return ret
 
 console.log "n is #{n.value()}"
-for i in [25...40]
+for i in [20...1000]
   v = f i, n
   console.log "#{i} -> #{v}"
 
