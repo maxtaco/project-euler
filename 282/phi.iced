@@ -59,18 +59,36 @@ mod_exp = (b,x,m) ->
     x = Math.floor(x/2)
   ret
 
-n = Factorization.factorize Math.pow(14,8)
+phi = (n) ->
+  (Factorization.factorize n).phi().value()
+
+N = Math.pow(14,8)
+
 f = (a,n) ->
-  if n is 1 then return 0
-  if a is 0 then return 1
-  if a is 1 then return 2
-  x = f(a-1, n.phi())
-  ret = mod_exp 2, x, n.value()
+  if n <= 1 then return 0
+  if a is 1 then return (2%n)
+  x = f(a-1, phi(n))
+  ret = mod_exp 2, x, n
   return ret
 
-console.log "n is #{n.value()}"
-for i in [20...1000]
-  v = f i, n
-  console.log "#{i} -> #{v}"
+A = (m,n) ->
+  if m is 0 then n+1
+  else if n is 0 then A(m-1,1)
+  else A(m-1,A(m,n-1))
 
+d = []
+for i in [0..3]
+  d[i] = A(i,i)
 
+d[4] = f(4+3, N) - 3
+d[5] = f(30,N) - 3
+d[6] = d[5]
+
+ret = 0
+mod = N
+for v in d
+  ret = (ret + v) % mod
+console.log d
+console.log ret
+console.log f(4+3,N)
+console.log f(10000,N)
