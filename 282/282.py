@@ -84,11 +84,9 @@ class PrimeFactorization:
     factors = [ (p**self.factors[p]) for p in primes ]
 
     for a in factors:
-      v = 1
-      for b in factors:
-        if a != b:
-          (ainv,_) = egcd(a, b)
-          v = (v*a*ainv)%n
+      r = n/a
+      (rinv,_) = egcd(r, a)
+      v = (r*rinv)%n
       ret.append(v)
     return [primes, ret]
 
@@ -139,10 +137,9 @@ def A(m,n):
 
 #----------------------------------------
 
-d = [0]*6
-for i in range(0,3):
+d = [0]*7
+for i in range(0,4):
   d[i] = A(i,i)
-print d
 
 #----------------------------------------
 
@@ -152,7 +149,6 @@ log_small_f = [ 0, 1, 2, 4, 16, 65536 ]
 
 def f(a,n):
   val = n.value()
-  print "+> f({0},{1})".format(a,val)
   if val <= 1: return 0
   if a == 1: return (2%val)
 
@@ -174,22 +170,23 @@ def f(a,n):
   else:
     # compute the chinese remainder factors
     (primes, crf) = n.crt()
-    print "CRT {0} -> ".format(val)
-    print "  " + str(n)
-    print "  " + str(primes)
-    print "  " + str(crf)
-    tot = 0
+    ret = 0
     for (i,p) in enumerate(primes):
       x = f(a,n.break_off(p))
-      tot = (tot + x*crf[i]) % val
-    ret = tot
-  print "-> f({0},{1}) -> {2}".format(a,val,ret)
+      ret = (ret + x*crf[i]) % val
   return ret
 
 #----------------------------------------
 
 N = PrimeFactorization.factorize(14**8)
+d[4] = f(7,N)-3
+d[5] = f(100,N)-3
+d[6] = d[5]
 
-print f(3,N)
+print d
 
+ret = 0
+for i in d:
+  ret = (ret + i) % N.value()
+print ret
 
