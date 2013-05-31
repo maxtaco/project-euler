@@ -61,4 +61,14 @@ class PrimeFactorization:
         ret *= k
     return ret
 
+def mod_exp (b,x,m):
+  if m <= 1: return 0
+  ret = 1
+  while x > 0:
+    if (x & 0x1):
+      ret = (b*ret)%m
+    b = (b*b)%m
+    x = x >> 1
+  return ret
+
 print PrimeFactorization.factorize(2*3*3*5*5*7*7*11*11*11*11).value()

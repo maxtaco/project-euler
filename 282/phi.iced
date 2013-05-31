@@ -76,6 +76,11 @@ A = (m,n) ->
   else if n is 0 then A(m-1,1)
   else A(m-1,A(m,n-1))
 
+#for i in [0...1000]
+#  console.log "#{i} #{f(i,N)}" 
+#process.exit 0
+
+
 d = []
 for i in [0..3]
   d[i] = A(i,i)
@@ -90,5 +95,5 @@ for v in d
   ret = (ret + v) % mod
 console.log d
 console.log ret
-console.log f(4+3,N)
-console.log f(10000,N)
+#console.log f(4+3,N)
+#console.log f(10000,N)
