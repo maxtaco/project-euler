@@ -68,7 +68,7 @@ class PrimeFactorization:
         d.inc(f,i)
     return PrimeFactorization(d)
 
-  def value(self):
+  def __int__(self):
     ret = 1
     for (k,v) in self.factors.items():
       for i in range(0,v):
@@ -78,7 +78,7 @@ class PrimeFactorization:
   # Chinese remainder theorem...
   def crt(self):
     primes = self.factors.keys()
-    n = self.value()
+    n = int(self)
     primes.sort()
     ret = []
     factors = [ (p**self.factors[p]) for p in primes ]
@@ -147,46 +147,67 @@ for i in range(0,4):
 small_f =     [ 0, 2, 4, 16, 65536 ]
 log_small_f = [ 0, 1, 2, 4, 16, 65536 ]
 
-def f(a,n):
-  val = n.value()
-  if val <= 1: return 0
-  if a == 1: return (2%val)
+# compute 2^2^...^2 a times, modulo m
+def f(a,m_pf):
 
-  if n.n_factors() == 1:
+  # m_pf is a prime factorization of m.  m now is the integer value of it
+  m = int(m_pf)
 
-    if n.first_factor() == 2:
-      e = n.exp(2)
+  # base cases
+  if m <= 1: return 0
+  if a == 1: return (2%m)
+
+  if m_pf.n_factors() == 1:
+
+    # If m is a power of 2, it's a special case we need to deal with,
+    # since we have a base of 2 for our exponentiation as well.
+    if m_pf.first_factor() == 2:
+      # The exponent that is applied to 2 in this factorization
+      e = m_pf.exp(2)
+
       # 2^2^..2^2 >= 2^e, so just 0
       if a >= len(log_small_f) or e <= log_small_f[a]:
         ret = 0
       else:
+        # Otherwise, no need to mod, since it's less than the modulus
         ret = small_f[a]
 
     else:
-      # Finally, a recursive case!
-      x = f(a-1,n.phi())
-      ret = mod_exp(2,x,val)
+      # Finally, a recursive case! If gcd(2,n) = 1, then we
+      # can simplify the exponentiation and take the exponent
+      # modulo phi(n).  So here goes, first compute the exponent:
+      x = f(a-1,m_pf.phi())
+
+      # now actually do the exponentiation, but we know that x < m,
+      # which is helpful
+      ret = mod_exp(2,x,m)
 
   else:
-    # compute the chinese remainder factors
-    (primes, crf) = n.crt()
+    # compute the chinese remainder factors.
+    (primes, crf) = m_pf.crt()
+
     ret = 0
     for (i,p) in enumerate(primes):
-      x = f(a,n.break_off(p))
-      ret = (ret + x*crf[i]) % val
+
+      # Compute f recursively on all of the prime factors
+      x = f(a,m_pf.break_off(p))
+
+      # And chinese remainder them back together....
+      ret = (ret + x*crf[i]) % m
+      
   return ret
 
 #----------------------------------------
 
 N = PrimeFactorization.factorize(14**8)
-d[4] = f(7,N)-3
-d[5] = f(100,N)-3
-d[6] = d[5]
+d[4] = f(7,N)-3 # as per ackermann definition
+d[5] = f(100,N)-3 # since everything over 10 or so is the same...
+d[6] = d[5] # see above...
 
 print d
 
 ret = 0
 for i in d:
-  ret = (ret + i) % N.value()
+  ret = (ret + i) % int(N)
 print ret
 
